@@ -39,27 +39,38 @@ namespace LZ4PCL
         /// <param name="len">The length (in bytes).</param>
         internal static unsafe void BlockCopy(byte* src, byte* dst, int len)
         {
-            while (len >= 8) {
-                *(ulong*) dst = *(ulong*) src;
-                dst += 8;
-                src += 8;
-                len -= 8;
+            try
+            {
+                while (len >= 8)
+                {
+                    *(ulong*)dst = *(ulong*)src;
+                    dst += 8;
+                    src += 8;
+                    len -= 8;
+                }
+      
+                if (len >= 4)
+                {
+                    *(uint*)dst = *(uint*)src;
+                    dst += 4;
+                    src += 4;
+                    len -= 4;
+                }
+         
+                if (len >= 2)
+                {
+                    *(ushort*)dst = *(ushort*)src;
+                    dst += 2;
+                    src += 2;
+                    len -= 2;
+                }
+         
+                if (len >= 1)
+                {
+                    *dst = *src; /* d++; s++; l--; */
+                }
             }
-            if (len >= 4) {
-                *(uint*) dst = *(uint*) src;
-                dst += 4;
-                src += 4;
-                len -= 4;
-            }
-            if (len >= 2) {
-                *(ushort*) dst = *(ushort*) src;
-                dst += 2;
-                src += 2;
-                len -= 2;
-            }
-            if (len >= 1) {
-                *dst = *src; /* d++; s++; l--; */
-            }
+            catch (Exception e) { throw new Exception("D"); }
         }
 
         /// <summary>Copies block of memory.</summary>
@@ -68,19 +79,22 @@ namespace LZ4PCL
         /// <param name="val">The value.</param>
         private static unsafe void BlockFill(byte* dst, int len, byte val)
         {
-            if (len >= 8) {
+            if (len >= 8)
+            {
                 ulong mask = val;
                 mask |= mask << 8;
                 mask |= mask << 16;
                 mask |= mask << 32;
-                do {
-                    *(ulong*) dst = mask;
+                do
+                {
+                    *(ulong*)dst = mask;
                     dst += 8;
                     len -= 8;
                 } while (len >= 8);
             }
 
-            while (len-- > 0) {
+            while (len-- > 0)
+            {
                 *dst++ = val;
             }
         }
@@ -99,14 +113,19 @@ namespace LZ4PCL
             int inputLength,
             int outputLength)
         {
-            if (inputLength < LZ4_64KLIMIT) {
+            if (inputLength < LZ4_64KLIMIT)
+            {
                 var hashTable = new ushort[HASH64K_TABLESIZE];
-                fixed (ushort* h = &hashTable[0]) {
+                fixed (ushort* h = &hashTable[0])
+                {
                     return LZ4_compress64kCtx_32(h, input, output, inputLength, outputLength);
                 }
-            } else {
+            }
+            else
+            {
                 var hashTable = new byte*[HASH_TABLESIZE];
-                fixed (byte** h = &hashTable[0]) {
+                fixed (byte** h = &hashTable[0])
+                {
                     return LZ4_compressCtx_32(h, input, output, inputLength, outputLength);
                 }
             }
@@ -132,12 +151,15 @@ namespace LZ4PCL
                 input, inputOffset, ref inputLength,
                 output, outputOffset, ref outputLength);
 
-            if (outputLength == 0) {
+            if (outputLength == 0)
+            {
                 return 0;
             }
 
-            fixed (byte* inputPtr = &input[inputOffset]) {
-                fixed (byte* outputPtr = &output[outputOffset]) {
+            fixed (byte* inputPtr = &input[inputOffset])
+            {
+                fixed (byte* outputPtr = &output[outputOffset])
+                {
                     return Encode32(inputPtr, outputPtr, inputLength, outputLength);
                 }
             }
@@ -150,22 +172,27 @@ namespace LZ4PCL
         /// <returns>Compressed buffer.</returns>
         public static byte[] Encode32(byte[] input, int inputOffset, int inputLength)
         {
-            if (inputLength < 0) {
+            if (inputLength < 0)
+            {
                 inputLength = input.Length - inputOffset;
             }
 
-            if (input == null) {
+            if (input == null)
+            {
                 throw new ArgumentNullException("input");
             }
-            if (inputOffset < 0 || inputOffset + inputLength > input.Length) {
+            if (inputOffset < 0 || inputOffset + inputLength > input.Length)
+            {
                 throw new ArgumentException("inputOffset and inputLength are invalid for given input");
             }
 
             var result = new byte[MaximumOutputLength(inputLength)];
             int length = Encode32(input, inputOffset, inputLength, result, 0, result.Length);
 
-            if (length != result.Length) {
-                if (length < 0) {
+            if (length != result.Length)
+            {
+                if (length < 0)
+                {
                     throw new InvalidOperationException("Compression has been corrupted");
                 }
                 var buffer = new byte[length];
@@ -193,15 +220,20 @@ namespace LZ4PCL
             int outputLength,
             bool knownOutputLength)
         {
-            if (knownOutputLength) {
+            if (knownOutputLength)
+            {
                 int length = LZ4_uncompress_32(input, output, outputLength);
-                if (length != inputLength) {
+                if (length != inputLength)
+                {
                     throw new ArgumentException("LZ4 block is corrupted, or invalid length has been given.");
                 }
                 return outputLength;
-            } else {
+            }
+            else
+            {
                 int length = LZ4_uncompress_unknownOutputSize_32(input, output, inputLength, outputLength);
-                if (length < 0) {
+                if (length < 0)
+                {
                     throw new ArgumentException("LZ4 block is corrupted, or invalid length has been given.");
                 }
                 return length;
@@ -230,12 +262,15 @@ namespace LZ4PCL
                 input, inputOffset, ref inputLength,
                 output, outputOffset, ref outputLength);
 
-            if (outputLength == 0) {
+            if (outputLength == 0)
+            {
                 return 0;
             }
 
-            fixed (byte* inputPtr = &input[inputOffset]) {
-                fixed (byte* outputPtr = &output[outputOffset]) {
+            fixed (byte* inputPtr = &input[inputOffset])
+            {
+                fixed (byte* outputPtr = &output[outputOffset])
+                {
                     return Decode32(inputPtr, inputLength, outputPtr, outputLength, knownOutputLength);
                 }
             }
@@ -249,20 +284,24 @@ namespace LZ4PCL
         /// <returns>Decompressed buffer.</returns>
         public static byte[] Decode32(byte[] input, int inputOffset, int inputLength, int outputLength)
         {
-            if (inputLength < 0) {
+            if (inputLength < 0)
+            {
                 inputLength = input.Length - inputOffset;
             }
 
-            if (input == null) {
+            if (input == null)
+            {
                 throw new ArgumentNullException("input");
             }
-            if (inputOffset < 0 || inputOffset + inputLength > input.Length) {
+            if (inputOffset < 0 || inputOffset + inputLength > input.Length)
+            {
                 throw new ArgumentException("inputOffset and inputLength are invalid for given input");
             }
 
             var result = new byte[outputLength];
             int length = Decode32(input, inputOffset, inputLength, result, 0, outputLength, true);
-            if (length != outputLength) {
+            if (length != outputLength)
+            {
                 throw new ArgumentException("outputLength is not valid");
             }
             return result;
@@ -284,14 +323,19 @@ namespace LZ4PCL
             int inputLength,
             int outputLength)
         {
-            if (inputLength < LZ4_64KLIMIT) {
+            if (inputLength < LZ4_64KLIMIT)
+            {
                 var hashTable = new ushort[HASH64K_TABLESIZE];
-                fixed (ushort* h = &hashTable[0]) {
+                fixed (ushort* h = &hashTable[0])
+                {
                     return LZ4_compress64kCtx_64(h, input, output, inputLength, outputLength);
                 }
-            } else {
+            }
+            else
+            {
                 var hashTable = new uint[HASH_TABLESIZE];
-                fixed (uint* h = &hashTable[0]) {
+                fixed (uint* h = &hashTable[0])
+                {
                     return LZ4_compressCtx_64(h, input, output, inputLength, outputLength);
                 }
             }
@@ -317,12 +361,15 @@ namespace LZ4PCL
                 input, inputOffset, ref inputLength,
                 output, outputOffset, ref outputLength);
 
-            if (outputLength == 0) {
+            if (outputLength == 0)
+            {
                 return 0;
             }
 
-            fixed (byte* inputPtr = &input[inputOffset]) {
-                fixed (byte* outputPtr = &output[outputOffset]) {
+            fixed (byte* inputPtr = &input[inputOffset])
+            {
+                fixed (byte* outputPtr = &output[outputOffset])
+                {
                     return Encode64(inputPtr, outputPtr, inputLength, outputLength);
                 }
             }
@@ -335,22 +382,27 @@ namespace LZ4PCL
         /// <returns>Compressed buffer.</returns>
         public static byte[] Encode64(byte[] input, int inputOffset, int inputLength)
         {
-            if (inputLength < 0) {
+            if (inputLength < 0)
+            {
                 inputLength = input.Length - inputOffset;
             }
 
-            if (input == null) {
+            if (input == null)
+            {
                 throw new ArgumentNullException("input");
             }
-            if (inputOffset < 0 || inputOffset + inputLength > input.Length) {
+            if (inputOffset < 0 || inputOffset + inputLength > input.Length)
+            {
                 throw new ArgumentException("inputOffset and inputLength are invalid for given input");
             }
 
             var result = new byte[MaximumOutputLength(inputLength)];
             int length = Encode64(input, inputOffset, inputLength, result, 0, result.Length);
 
-            if (length != result.Length) {
-                if (length < 0) {
+            if (length != result.Length)
+            {
+                if (length < 0)
+                {
                     throw new InvalidOperationException("Compression has been corrupted");
                 }
                 var buffer = new byte[length];
@@ -378,15 +430,20 @@ namespace LZ4PCL
             int outputLength,
             bool knownOutputLength)
         {
-            if (knownOutputLength) {
+            if (knownOutputLength)
+            {
                 int length = LZ4_uncompress_64(input, output, outputLength);
-                if (length != inputLength) {
+                if (length != inputLength)
+                {
                     throw new ArgumentException("LZ4 block is corrupted, or invalid length has been given.");
                 }
                 return outputLength;
-            } else {
+            }
+            else
+            {
                 int length = LZ4_uncompress_unknownOutputSize_64(input, output, inputLength, outputLength);
-                if (length < 0) {
+                if (length < 0)
+                {
                     throw new ArgumentException("LZ4 block is corrupted, or invalid length has been given.");
                 }
                 return length;
@@ -415,12 +472,15 @@ namespace LZ4PCL
                 input, inputOffset, ref inputLength,
                 output, outputOffset, ref outputLength);
 
-            if (outputLength == 0) {
+            if (outputLength == 0)
+            {
                 return 0;
             }
 
-            fixed (byte* inputPtr = &input[inputOffset]) {
-                fixed (byte* outputPtr = &output[outputOffset]) {
+            fixed (byte* inputPtr = &input[inputOffset])
+            {
+                fixed (byte* outputPtr = &output[outputOffset])
+                {
                     return Decode64(inputPtr, inputLength, outputPtr, outputLength, knownOutputLength);
                 }
             }
@@ -434,20 +494,24 @@ namespace LZ4PCL
         /// <returns>Decompressed buffer.</returns>
         public static byte[] Decode64(byte[] input, int inputOffset, int inputLength, int outputLength)
         {
-            if (inputLength < 0) {
+            if (inputLength < 0)
+            {
                 inputLength = input.Length - inputOffset;
             }
 
-            if (input == null) {
+            if (input == null)
+            {
                 throw new ArgumentNullException("input");
             }
-            if (inputOffset < 0 || inputOffset + inputLength > input.Length) {
+            if (inputOffset < 0 || inputOffset + inputLength > input.Length)
+            {
                 throw new ArgumentException("inputOffset and inputLength are invalid for given input");
             }
 
             var result = new byte[outputLength];
             int length = Decode64(input, inputOffset, inputLength, result, 0, outputLength, true);
-            if (length != outputLength) {
+            if (length != outputLength)
+            {
                 throw new ArgumentException("outputLength is not valid");
             }
             return result;
@@ -464,13 +528,15 @@ namespace LZ4PCL
 
         private static unsafe LZ4HC_Data_Structure LZ4HC_Create(byte* src)
         {
-            var hc4 = new LZ4HC_Data_Structure {
+            var hc4 = new LZ4HC_Data_Structure
+            {
                 hashTable = new int[HASHHC_TABLESIZE],
                 chainTable = new ushort[MAXD]
             };
 
-            fixed (ushort* ct = &hc4.chainTable[0]) {
-                BlockFill((byte*) ct, MAXD * sizeof (ushort), 0xFF);
+            fixed (ushort* ct = &hc4.chainTable[0])
+            {
+                BlockFill((byte*)ct, MAXD * sizeof(ushort), 0xFF);
             }
 
             hc4.src_base = src;
@@ -512,7 +578,8 @@ namespace LZ4PCL
             int outputOffset,
             int outputLength)
         {
-            if (inputLength == 0) {
+            if (inputLength == 0)
+            {
                 return 0;
             }
 
@@ -520,8 +587,10 @@ namespace LZ4PCL
                 input, inputOffset, ref inputLength,
                 output, outputOffset, ref outputLength);
 
-            fixed (byte* inputPtr = &input[inputOffset]) {
-                fixed (byte* outputPtr = &output[outputOffset]) {
+            fixed (byte* inputPtr = &input[inputOffset])
+            {
+                fixed (byte* outputPtr = &output[outputOffset])
+                {
                     int length = LZ4_compressHC_32(inputPtr, outputPtr, inputLength, outputLength);
                     return length <= 0 ? -1 : length;
                 }
@@ -536,18 +605,21 @@ namespace LZ4PCL
         public static byte[] Encode32HC(
             byte[] input, int inputOffset, int inputLength)
         {
-            if (inputLength == 0) {
+            if (inputLength == 0)
+            {
                 return new byte[0];
             }
             int outputLength = MaximumOutputLength(inputLength);
             var result = new byte[outputLength];
             int length = Encode32HC(input, inputOffset, inputLength, result, 0, outputLength);
 
-            if (length < 0) {
+            if (length < 0)
+            {
                 throw new ArgumentException("Provided data seems to be corrupted.");
             }
 
-            if (length != outputLength) {
+            if (length != outputLength)
+            {
                 var buffer = new byte[length];
                 Buffer.BlockCopy(result, 0, buffer, 0, length);
                 result = buffer;
@@ -581,7 +653,8 @@ namespace LZ4PCL
             int outputOffset,
             int outputLength)
         {
-            if (inputLength == 0) {
+            if (inputLength == 0)
+            {
                 return 0;
             }
 
@@ -589,8 +662,10 @@ namespace LZ4PCL
                 input, inputOffset, ref inputLength,
                 output, outputOffset, ref outputLength);
 
-            fixed (byte* inputPtr = &input[inputOffset]) {
-                fixed (byte* outputPtr = &output[outputOffset]) {
+            fixed (byte* inputPtr = &input[inputOffset])
+            {
+                fixed (byte* outputPtr = &output[outputOffset])
+                {
                     int length = LZ4_compressHC_64(inputPtr, outputPtr, inputLength, outputLength);
                     return length <= 0 ? -1 : length;
                 }
@@ -605,18 +680,21 @@ namespace LZ4PCL
         public static byte[] Encode64HC(
             byte[] input, int inputOffset, int inputLength)
         {
-            if (inputLength == 0) {
+            if (inputLength == 0)
+            {
                 return new byte[0];
             }
             int outputLength = MaximumOutputLength(inputLength);
             var result = new byte[outputLength];
             int length = Encode64HC(input, inputOffset, inputLength, result, 0, outputLength);
 
-            if (length < 0) {
+            if (length < 0)
+            {
                 throw new ArgumentException("Provided data seems to be corrupted.");
             }
 
-            if (length != outputLength) {
+            if (length != outputLength)
+            {
                 var buffer = new byte[length];
                 Buffer.BlockCopy(result, 0, buffer, 0, length);
                 result = buffer;

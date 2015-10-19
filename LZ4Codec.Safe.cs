@@ -37,7 +37,7 @@ namespace LZ4PCL
     /// <summary>Safe LZ4 codec.</summary>
     public static partial class LZ4Codec
     {
-        #region Helper
+    #region Helper
 
         // ReSharper disable UnusedParameter.Local
 
@@ -54,7 +54,7 @@ namespace LZ4PCL
 
         #endregion
 
-        #region Byte manipulation
+    #region Byte manipulation
 
         // ReSharper disable RedundantCast
 
@@ -148,7 +148,7 @@ namespace LZ4PCL
 
         #endregion
 
-        #region Byte block copy
+    #region Byte block copy
 
         private static void Copy4(byte[] buf, int src, int dst)
         {
@@ -310,7 +310,7 @@ namespace LZ4PCL
 
         #endregion
 
-        #region Encode32
+    #region Encode32
 
         /// <summary>Encodes the specified input.</summary>
         /// <param name="input">The input.</param>
@@ -378,9 +378,9 @@ namespace LZ4PCL
             return result;
         }
 
-        #endregion
+    #endregion
 
-        #region Encode64
+    #region Encode64
 
         /// <summary>Encodes the specified input.</summary>
         /// <param name="input">The input.</param>
@@ -448,9 +448,9 @@ namespace LZ4PCL
             return result;
         }
 
-        #endregion
+    #endregion
 
-        #region Decode32
+    #region Decode32
 
         /// <summary>Decodes the specified input.</summary>
         /// <param name="input">The input.</param>
@@ -521,9 +521,9 @@ namespace LZ4PCL
             return result;
         }
 
-        #endregion
+    #endregion
 
-        #region Decode64
+    #region Decode64
 
         /// <summary>Decodes the specified input.</summary>
         /// <param name="input">The input.</param>
@@ -594,9 +594,9 @@ namespace LZ4PCL
             return result;
         }
 
-        #endregion
+    #endregion
 
-        #region HC utilities
+    #region HC utilities
 
         // ReSharper disable InconsistentNaming
 
@@ -643,9 +643,9 @@ namespace LZ4PCL
             public int src_end;
         };
 
-        #endregion
+    #endregion
 
-        #region Encode32HC
+    #region Encode32HC
 
         private static int LZ4_compressHC_32(
             byte[] input, int inputOffset, int inputLength,
@@ -712,9 +712,9 @@ namespace LZ4PCL
             return result;
         }
 
-        #endregion
+    #endregion
 
-        #region Encode64HC
+    #region Encode64HC
 
         private static int LZ4_compressHC_64(
             byte[] input, int inputOffset, int inputLength,
@@ -781,7 +781,7 @@ namespace LZ4PCL
             return result;
         }
 
-        #endregion
+    #endregion
     }
 #endif
 }
