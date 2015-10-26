@@ -19,25 +19,26 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Build\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;INCLUDE_UNSAFE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>..\Build\Debug\LZ4PCL.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\Build\Release\</OutputPath>
     <DefineConstants>INCLUDE_UNSAFE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>0</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DocumentationFile>bin\Release\LZ4PCL.xml</DocumentationFile>
+    <DocumentationFile>..\Build\Release\LZ4PCL.XML</DocumentationFile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseWithUnsafe|AnyCPU' ">
-    <OutputPath>bin\ReleaseWithUnsafe\</OutputPath>
+    <OutputPath>..\Build\%24%28ConfigurationName%29\</OutputPath>
     <Optimize>true</Optimize>
     <WarningLevel>0</WarningLevel>
     <DebugType>pdbonly</DebugType>
@@ -48,7 +49,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>
     </DefineConstants>
-    <DocumentationFile>bin\ReleaseWithUnsafe\LZ4PCL.xml</DocumentationFile>
+    <DocumentationFile>../Build/%24%28ConfigurationName%29/LZ4PCL.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
